@@ -5,7 +5,7 @@
 
 using namespace std;
 
-vector<int> gloutonOrdreNaturel(const vector<vector<int>> &adj)
+vector<int> calculerNiGloutonOrdreNaturel(const vector<vector<int>> &adj)
 {
     int n = adj.size();
     vector<int> couleur(n, 0);
@@ -37,7 +37,7 @@ vector<int> gloutonOrdreNaturel(const vector<vector<int>> &adj)
     return valeurs_ni;
 }
 
-vector<int> gloutonDegreDecroissant(const vector<vector<int>> &adj)
+vector<int> calculerNiGloutonDegreDecroissant(const vector<vector<int>> &adj)
 {
     int n = adj.size();
     vector<int> couleur(n, 0);

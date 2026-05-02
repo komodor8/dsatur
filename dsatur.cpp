@@ -4,7 +4,7 @@
 
 using namespace std;
 
-vector<int> calculerNi(const vector<vector<int>> &adj)
+vector<int> calculerNiDsatur(const vector<vector<int>> &adj)
 {
     int n = adj.size();
     vector<int> couleur(n, 0);

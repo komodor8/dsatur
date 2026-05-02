@@ -10,7 +10,6 @@
 
 using namespace std;
 
-// --- FONCTIONS DE LECTURE ---
 vector<vector<int>> lireGrapheSNAP(string nomFichier)
 {
     ifstream fichier(nomFichier);
@@ -56,7 +55,7 @@ vector<vector<int>> lireGrapheDIMACS(string nomFichier)
     }
 
     string type_ligne;
-    int n = 0; // Nombre de sommets
+    int n = 0;
 
     // On lit le premier mot de chaque ligne
     while (fichier >> type_ligne)
@@ -84,7 +83,6 @@ vector<vector<int>> lireGrapheDIMACS(string nomFichier)
             fichier >> u >> v;
 
             // Attention : DIMACS commence à 1, nos tableaux commencent à 0 !
-            // On soustrait donc 1 à chaque sommet.
             adj[u - 1].push_back(v - 1);
             adj[v - 1].push_back(u - 1);
         }
@@ -94,7 +92,7 @@ vector<vector<int>> lireGrapheDIMACS(string nomFichier)
     return adj;
 }
 
-double calculerRatioRho(const vector<int> &valeurs_ni, int n)
+double calculerRatio(const vector<int> &valeurs_ni, int n)
 {
     if (valeurs_ni.empty() || n == 0)
         return 0.0;
@@ -102,7 +100,6 @@ double calculerRatioRho(const vector<int> &valeurs_ni, int n)
     return (double)n_k / n;
 }
 
-// --- PROGRAMME PRINCIPAL ---
 int main()
 {
     string fichier_test = "./data/graph_test_example_l.txt";
@@ -117,23 +114,20 @@ int main()
     int n = graphe.size();
     cout << "--- ANALYSE DU GRAPHE (" << n << " sommets) ---" << endl;
 
-    // Appel à glouton.cpp
-    vector<int> ni_nat = gloutonOrdreNaturel(graphe);
+    vector<int> ni_nat = calculerNiGloutonOrdreNaturel(graphe);
     cout << "\n[GLOUTON - Ordre Naturel]" << endl;
     cout << "Couleurs utilisees (k) : " << ni_nat.size() << endl;
-    cout << "Ratio rho : " << calculerRatioRho(ni_nat, n) << endl;
+    cout << "Ratio : " << calculerRatio(ni_nat, n) << endl;
 
-    // Appel à glouton.cpp
-    vector<int> ni_deg = gloutonDegreDecroissant(graphe);
+    vector<int> ni_deg = calculerNiGloutonDegreDecroissant(graphe);
     cout << "\n[GLOUTON - Degre Decroissant]" << endl;
     cout << "Couleurs utilisees (k) : " << ni_deg.size() << endl;
-    cout << "Ratio rho : " << calculerRatioRho(ni_deg, n) << endl;
+    cout << "Ratio : " << calculerRatio(ni_deg, n) << endl;
 
-    // Appel à dsatur.cpp
     cout << "\n[DSATUR]" << endl;
-    vector<int> ni_dsatur = calculerNi(graphe);
+    vector<int> ni_dsatur = calculerNiDsatur(graphe);
     cout << "Couleurs utilisees (k) : " << ni_dsatur.size() << endl;
-    cout << "Ratio rho : " << calculerRatioRho(ni_dsatur, n) << endl;
+    cout << "Ratio : " << calculerRatio(ni_dsatur, n) << endl;
 
     return 0;
 }
