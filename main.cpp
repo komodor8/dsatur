@@ -44,6 +44,56 @@ vector<vector<int>> lireGrapheSNAP(string nomFichier)
     return adj;
 }
 
+vector<vector<int>> lireGrapheDIMACS(string nomFichier)
+{
+    ifstream fichier(nomFichier);
+    vector<vector<int>> adj;
+
+    if (!fichier.is_open())
+    {
+        cerr << "Erreur : Impossible d'ouvrir le fichier " << nomFichier << " !" << endl;
+        return adj;
+    }
+
+    string type_ligne;
+    int n = 0; // Nombre de sommets
+
+    // On lit le premier mot de chaque ligne
+    while (fichier >> type_ligne)
+    {
+        if (type_ligne == "c")
+        {
+            // C'est un commentaire : on lit tout le reste de la ligne et on l'ignore
+            string commentaire;
+            getline(fichier, commentaire);
+        }
+        else if (type_ligne == "p")
+        {
+            // C'est la définition du graphe : p edge n m
+            string mot_edge;
+            int m; // nombre d'arêtes (on ne s'en sert pas vraiment ici, mais il faut le lire)
+            fichier >> mot_edge >> n >> m;
+
+            // On connaît maintenant la taille du graphe, on redimensionne la liste
+            adj.resize(n);
+        }
+        else if (type_ligne == "e")
+        {
+            // C'est une arête : e u v
+            int u, v;
+            fichier >> u >> v;
+
+            // Attention : DIMACS commence à 1, nos tableaux commencent à 0 !
+            // On soustrait donc 1 à chaque sommet.
+            adj[u - 1].push_back(v - 1);
+            adj[v - 1].push_back(u - 1);
+        }
+    }
+
+    fichier.close();
+    return adj;
+}
+
 double calculerRatioRho(const vector<int> &valeurs_ni, int n)
 {
     if (valeurs_ni.empty() || n == 0)
@@ -55,7 +105,7 @@ double calculerRatioRho(const vector<int> &valeurs_ni, int n)
 // --- PROGRAMME PRINCIPAL ---
 int main()
 {
-    string fichier_test = "./data/facebook_combined.txt";
+    string fichier_test = "./data/graph_test_example_l.txt";
     vector<vector<int>> graphe = lireGrapheSNAP(fichier_test);
 
     if (graphe.empty())
