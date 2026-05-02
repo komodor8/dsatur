@@ -69,7 +69,12 @@ Testing/
 .cache/
 
 
-/data/*
+# On ignore tout le contenu du dossier data
+data/*
+
+!data/graphe_test_snap.txt
+
+
 program
 
 .DS_Store
