@@ -73,6 +73,8 @@ Testing/
 data/*
 
 !data/graphe_test_snap.txt
+!data/graph_test_example_r.txt
+!data/graph_test_example_l.txt
 
 
 program
