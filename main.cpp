@@ -57,32 +57,26 @@ vector<vector<int>> lireGrapheDIMACS(string nomFichier)
     string type_ligne;
     int n = 0;
 
-    // On lit le premier mot de chaque ligne
     while (fichier >> type_ligne)
     {
         if (type_ligne == "c")
         {
-            // C'est un commentaire : on lit tout le reste de la ligne et on l'ignore
             string commentaire;
             getline(fichier, commentaire);
         }
         else if (type_ligne == "p")
         {
-            // C'est la définition du graphe : p edge n m
             string mot_edge;
-            int m; // nombre d'arêtes (on ne s'en sert pas vraiment ici, mais il faut le lire)
+            int m;
             fichier >> mot_edge >> n >> m;
 
-            // On connaît maintenant la taille du graphe, on redimensionne la liste
             adj.resize(n);
         }
         else if (type_ligne == "e")
         {
-            // C'est une arête : e u v
             int u, v;
             fichier >> u >> v;
 
-            // Attention : DIMACS commence à 1, nos tableaux commencent à 0 !
             adj[u - 1].push_back(v - 1);
             adj[v - 1].push_back(u - 1);
         }
@@ -100,10 +94,37 @@ double calculerRatio(const vector<int> &valeurs_ni, int n)
     return (double)n_k / n;
 }
 
+void afficherResultats(string nomAlgo, const vector<int> &valeurs_ni, int n)
+{
+    cout << "\n[" << nomAlgo << "]" << endl;
+
+    if (valeurs_ni.empty())
+    {
+        cout << "Erreur : Aucun sommet colorie." << endl;
+        return;
+    }
+
+    int k = valeurs_ni.size();
+    int n_k = valeurs_ni.back();
+    double rho = calculerRatio(valeurs_ni, n);
+
+    cout << "  - Nombre total de sommets (n)           : " << n << endl;
+    cout << "  - Couleurs utilisees (k)                : " << k << endl;
+    cout << "  - Sommet de la derniere couleur (n_k)   : " << n_k << endl;
+    cout << "  - Ratio d'avancement (rho)              : " << rho << " (soit " << rho * 100 << " %)" << endl;
+
+    cout << "  - Detail de l'ouverture des couleurs (n_i) :" << endl;
+    for (int i = 0; i < k; ++i)
+    {
+        cout << "      n_" << (i + 1) << " = " << valeurs_ni[i] << endl;
+    }
+    cout << "------------------------------------------------" << endl;
+}
+
 int main()
 {
-    string fichier_test = "./data/graph_test_example_l.txt";
-    vector<vector<int>> graphe = lireGrapheSNAP(fichier_test);
+    string fichier_test = "./data/le450_15b.col";
+    vector<vector<int>> graphe = lireGrapheDIMACS(fichier_test);
 
     if (graphe.empty())
     {
@@ -112,22 +133,18 @@ int main()
     }
 
     int n = graphe.size();
-    cout << "--- ANALYSE DU GRAPHE (" << n << " sommets) ---" << endl;
+    cout << "================================================" << endl;
+    cout << "          ANALYSE DU GRAPHE (" << n << " sommets)    " << endl;
+    cout << "================================================" << endl;
 
     vector<int> ni_nat = calculerNiGloutonOrdreNaturel(graphe);
-    cout << "\n[GLOUTON - Ordre Naturel]" << endl;
-    cout << "Couleurs utilisees (k) : " << ni_nat.size() << endl;
-    cout << "Ratio : " << calculerRatio(ni_nat, n) << endl;
+    afficherResultats("GLOUTON - Ordre Naturel", ni_nat, n);
 
     vector<int> ni_deg = calculerNiGloutonDegreDecroissant(graphe);
-    cout << "\n[GLOUTON - Degre Decroissant]" << endl;
-    cout << "Couleurs utilisees (k) : " << ni_deg.size() << endl;
-    cout << "Ratio : " << calculerRatio(ni_deg, n) << endl;
+    afficherResultats("GLOUTON - Degre Decroissant", ni_deg, n);
 
-    cout << "\n[DSATUR]" << endl;
     vector<int> ni_dsatur = calculerNiDsatur(graphe);
-    cout << "Couleurs utilisees (k) : " << ni_dsatur.size() << endl;
-    cout << "Ratio : " << calculerRatio(ni_dsatur, n) << endl;
+    afficherResultats("DSATUR", ni_dsatur, n);
 
     return 0;
 }
